@@ -9,6 +9,10 @@ const GROK_API_KEY = process.env.GROK_API_KEY;
 
 app.post('/api/chat', async (req, res) => {
   try {
+    if (!GROK_API_KEY) {
+      return res.status(500).json({ error: 'GROK_API_KEY is not set on server' });
+    }
+
     const response = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -16,7 +20,7 @@ app.post('/api/chat', async (req, res) => {
         'Authorization': 'Bearer ' + GROK_API_KEY
       },
       body: JSON.stringify({
-        model: 'grok-3-latest',
+        model: 'grok-beta',
         max_tokens: 1000,
         messages: req.body.messages
       })
@@ -25,11 +29,13 @@ app.post('/api/chat', async (req, res) => {
     const data = await response.json();
 
     if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || 'Grok API error' });
+      console.error('Grok API error:', JSON.stringify(data));
+      return res.status(response.status).json({ error: data.error?.message || JSON.stringify(data) });
     }
 
     res.json({ reply: data.choices[0].message.content });
   } catch (err) {
+    console.error('Server error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
