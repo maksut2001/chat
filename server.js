@@ -20,28 +20,27 @@ app.post('/api/chat', async (req, res) => {
         'Authorization': 'Bearer ' + GROK_API_KEY
       },
       body: JSON.stringify({
-        model: 'grok-beta',
+        model: 'grok-3',
         max_tokens: 1000,
         messages: req.body.messages
       })
     });
 
     const data = await response.json();
-    console.log('Grok response status:', response.status);
+    console.log('Status:', response.status, JSON.stringify(data).slice(0, 200));
 
     if (!response.ok) {
-      console.error('Grok error:', JSON.stringify(data));
       return res.status(response.status).json({ error: data.error?.message || JSON.stringify(data) });
     }
 
     res.json({ reply: data.choices[0].message.content });
   } catch (err) {
-    console.error('Server error:', err.message);
+    console.error('Error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get('/', (req, res) => res.send('BilimALL AI Server OK'));
+app.get('/', (req, res) => res.send('OK'));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Server running on port ' + PORT));
+app.listen(PORT, () => console.log('Running on port ' + PORT));
