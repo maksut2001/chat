@@ -10,7 +10,7 @@ const GROK_API_KEY = process.env.GROK_API_KEY;
 app.post('/api/chat', async (req, res) => {
   try {
     if (!GROK_API_KEY) {
-      return res.status(500).json({ error: 'GROK_API_KEY is not set on server' });
+      return res.status(500).json({ error: 'GROK_API_KEY орнатылмаған' });
     }
 
     const response = await fetch('https://api.x.ai/v1/chat/completions', {
@@ -27,9 +27,10 @@ app.post('/api/chat', async (req, res) => {
     });
 
     const data = await response.json();
+    console.log('Grok response status:', response.status);
 
     if (!response.ok) {
-      console.error('Grok API error:', JSON.stringify(data));
+      console.error('Grok error:', JSON.stringify(data));
       return res.status(response.status).json({ error: data.error?.message || JSON.stringify(data) });
     }
 
@@ -40,7 +41,7 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.send('BilimALL AI Server — жұмыс істеп тұр ✅'));
+app.get('/', (req, res) => res.send('BilimALL AI Server OK'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('Server running on port ' + PORT));
